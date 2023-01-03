@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template # Blueprint = express router
 
 bp = Blueprint('home', __name__, url_prefix='/') # Blueprint is used to aggregate routes
 
