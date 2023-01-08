@@ -1,5 +1,6 @@
 from flask import Flask
 from app.routes import home, dashboard # Import by routing through directories with '.', possible to import home due to __init__.py renaming
+from app.db import init_db
 # can also use -> from app.routes.home import bp as home -> used if bp is not imported into the __init__.py
 
 def create_app(test_config=None):
@@ -16,5 +17,7 @@ def create_app(test_config=None):
   
   app.register_blueprint(home)
   app.register_blueprint(dashboard)
+  
+  init_db(app)
 
   return app
