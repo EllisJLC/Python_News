@@ -31,19 +31,15 @@ def signup():
 
 @bp.route('/users/logout', methods=['POST'])
 def logout():
-  try:
-    print(session['user_id'])
-    session.clear() # Clear logged in session
-    return '', 204 # Return success, no content
-  except:
-    return 'logout error',400
+  session.clear() # Clear logged in session
+  return '', 204 # Return success, no content
 
 @bp.route('/users/login', methods=['POST'])
 def login():
   data = request.get_json()
   db = get_db()
   try: 
-    user = db.query(User).filter(User.email == data['email'].one())
+    user = db.query(User).filter(User.email == data['email']).one()
   except:
     print(sys.exc_info()[0])
     return jsonify(message = "Login failed. Please try again."),400
