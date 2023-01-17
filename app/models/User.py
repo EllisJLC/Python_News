@@ -16,6 +16,12 @@ class User(Base):
   # nullable = False -> disallow null
   # Column() -> creates a new column in SQL
 
+  def verify_password(self, password):
+    return bcrypt.checkpw(
+      password.encode('utf-8'),
+      self.password.encode('utf-8')
+    )
+
   @validates('email')
   def validate_email(self, key, email):
     assert '@' in email # Validates @ in email
@@ -25,5 +31,7 @@ class User(Base):
   def validate_password(self, key, password):
     assert len(password) > 4 # Ensures length of password string is greater than 4
     return bcrypt.hashpw(password.encode('utf-8'), salt)
+
+  
 
   
