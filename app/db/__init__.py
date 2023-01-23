@@ -1,11 +1,8 @@
 # __init__.py = turns folder into a package
 from os import getenv
-# from sqlalchemy.ext.declarative import declarative_base # Used to create classes
-# from sqlalchemy import create_engine # Engines are used to interpret data from the database
-# from sqlalchemy.orm import sessionmaker # Sessions used to maintain connection to database
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.declarative import declarative_base # Used to create classes
+from sqlalchemy import create_engine # Engines are used to interpret data from the database
+from sqlalchemy.orm import sessionmaker # Sessions used to maintain connection to database
 from dotenv import load_dotenv
 from flask import g # Used for global context
 
