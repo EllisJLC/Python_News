@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, session
 from app.models import User, Post, Comment, Vote
 from app.db import get_db
 import sys # Access interpreter functions
+from app.utils.auth import login_required
 
 bp = Blueprint('api', __name__, url_prefix='/api')
 
@@ -53,6 +54,7 @@ def login():
   return jsonify(id = user.id)
 
 @bp.route('/comments', methods=['POST'])
+@login_required
 def comment():
   data = request.get_json()
   db = get_db()
@@ -75,6 +77,7 @@ def comment():
   return jsonify(id = newComment.id)
 
 @bp.route('/posts/upvote', methods=['PUT'])
+@login_required
 def upvote():
   data = request.get_json()
   db = get_db()
@@ -82,7 +85,7 @@ def upvote():
   print(session.get('user_id'))
   try: 
     newVote = Vote( # Create a new vote item
-      post_id = data['post.id'],
+      post_id = data['post_id'],
       user_id = session.get('user_id')
     )
     print(newVote)
@@ -97,4 +100,64 @@ def upvote():
 
     return jsonify(message = "Cannot upvote, please try again."), 500
 
+  return '', 204
+
+@bp.route('/posts', methods = ['POST']) # Create post route
+@login_required
+def create():
+  data = request.get_json()
+  db = get_db()
+
+  try:
+    newPost = Post(
+      title = data['title'],
+      post_url = data['post_url'],
+      user_id = session.get('user_id')
+    )
+
+    db.add(newPost)
+    db.commit()
+  
+  except:
+    print(sys.exc_info()[0])
+    db.rollback()
+
+    return jsonify(message = 'Cannot create post'), 500
+  
+  return jsonify(id = newPost.id)
+
+@bp.route('/posts/<id>', methods = ['PUT']) # Update post route, <id> passes id as a parameter
+@login_required
+def update(id):
+  data = request.get_json()
+  db = get_db()
+
+  try:
+    post = db.query(Post).filter(Post.id == id).one() # Find the post given the id by filtering the results
+    post.title = data['title']
+    db.commit()
+  
+  except:
+    print(sys.exc_info()[0])
+    db.rollback()
+
+    return jsonify(message = "Post not found, please try again."), 404
+  
+  return '', 204
+
+@bp.route('/posts/<id>', methods = ['DELETE']) # Delete post route
+@login_required
+def delete(id):
+  db = get_db()
+
+  try:
+    db.delete(db.query(Post).filter(Post.id == id).one())
+    db.commit()
+
+  except:
+    print(sys.exc_info()[0])
+    db.rollback()
+
+    return jsonify(message = 'Post not found.'), 404
+  
   return '', 204
